@@ -2,6 +2,66 @@ import { Core } from '@strapi/strapi';
 import path from 'path';
 import fs from 'fs/promises';
 
+/**
+ * Interface for the required fields of a component. It defines the structure
+ * of a valid component.
+ * @typedef {Object} componentRequiredFields
+ * @property {string} uid - The unique identifier of the component.
+ * @property {string} category - The category to which the component belongs.
+ * @property {string} modelName - The name of the model associated with the component.
+ * @property {Object} info - An object containing information about the component.
+ * @property {string} info.displayName - The display name of the component.
+ * @property {string} info.icon - The icon associated with the component.
+ * @property {Object} attributes - An object containing the attributes of the component.
+ */
+interface componentRequiredFields {
+  uid: string;
+  category: string;
+  modelName: string;
+  info: {
+    displayName: string;
+    icon: string;
+  };
+  attributes: {
+    [key: string]: any;
+  };
+}
+
+/**
+ * Interface for the invalid component. It defines the structure of an invalid component.
+ * @typedef {Object} invalidComponent
+ * @property {string} collectionName - The name of the collection associated with the invalid component.
+ * @property {Object} info - An object containing information about the invalid component.
+ * @property {string} info.displayName - The display name of the invalid component.
+ * @property {string} info.icon - The icon associated with the invalid component.
+ * @property {Object} attributes - An object containing the attributes of the invalid component.
+ */
+interface invalidComponent {
+  collectionName: string;
+  info: {
+    displayName: string;
+    icon: string;
+  };
+  attributes: {
+    [key: string]: any;
+  };
+}
+
+/**
+ * Registers new components with Strapi.
+ *
+ * This function reads component definitions from JSON files located in the
+ * `components` directory. It processes both structured directories and standalone
+ * JSON files, validates each component, and registers it with Strapi if it doesn't
+ * already exist in the system.
+ *
+ * The directories are sorted by predefined categories to ensure a correct registration
+ * order. The function also handles errors during registration, logging the issues
+ * and prompting a retry if necessary. After successful registration, Strapi is reloaded
+ * to apply the changes.
+ *
+ * @param {Object} strapi - The Strapi instance used for registration and logging.
+ */
 export const registerComponents = async ({ strapi }: { strapi: Core.Strapi }) => {
   // Get existing components from Strapi
   const existingComponents = strapi.components;
@@ -167,7 +227,21 @@ export const registerComponents = async ({ strapi }: { strapi: Core.Strapi }) =>
   }
 };
 
-// Helper function to parse and validate a component
+/**
+ * Asynchronously reads and parses a JSON file to validate the structure of a component.
+ *
+ * @param {string} filePath - The path to the JSON file to be parsed.
+ * @param {Core.Strapi} strapi - The Strapi instance used for logging and error handling.
+ *
+ * @returns {Promise<null|Object>} - Returns the parsed component object if valid, otherwise null.
+ *
+ * The function reads the contents of the specified file, parses it as JSON,
+ * and checks for the presence of required fields such as 'uid', 'category',
+ * 'modelName', 'info.displayName', 'info.icon', and 'attributes'.
+ * If any of these fields are missing, the function logs an error and returns null.
+ * In the event of a parsing error, the function logs the error message and returns null.
+ */
+
 const parseAndValidateComponent = async (filePath: string, strapi: Core.Strapi) => {
   try {
     const content = await fs.readFile(filePath, 'utf-8');
