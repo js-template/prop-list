@@ -39,7 +39,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
    //console.log("Public Layout Loaded", data, error)
 
    return (
-      <html lang={language} dir={direction}>
+      <html lang={language} dir={direction} suppressHydrationWarning>
          <body dir={direction}>
             <StyledEngineProvider injectFirst>
                <GlobalProvider layout={data?.data || null}>
