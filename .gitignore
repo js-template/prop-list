@@ -56,3 +56,7 @@ tsconfig.tsbuildinfo
 
 .nx/cache
 .nx/workspace-data
+
+# ignoring prop-list
+projects/proplist-theme
+packages/backend/src/plugins/proplist-plugin
